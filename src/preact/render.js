@@ -7,6 +7,7 @@ const IS_HYDRATE = EMPTY_OBJ;
 
 /**
  * Render a Preact virtual node into a DOM element
+ * @description 渲染虚拟节点到真实节点
  * @param {import('./index').ComponentChild} vnode 虚拟节点
  * @param {import('./internal').PreactElement} parentDom 父节点
  * @param {Element | Text} [replaceNode] Optional: Attempt to re-use an
@@ -53,7 +54,8 @@ export function render(vnode, parentDom, replaceNode) {
 	);
 
 	// Flush all queued effects
-	commitRoot(commitQueue, vnode);
+	console.log('commitQueue', commitQueue);
+	commitRoot(commitQueue, vnode); // 渲染完成后执行queued effects
 }
 
 /**

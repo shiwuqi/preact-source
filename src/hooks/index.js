@@ -20,13 +20,19 @@ let oldBeforeUnmount = options.unmount;
 const RAF_TIMEOUT = 100;
 let prevRaf;
 
+/**
+ * 引入Hooks向options中添加_render方法，diff时判断option中是否有_render方法，有则执行该方法并把vnode传进来
+ * 获取currentComponent，设置currentIndex为0
+ */
 options._render = vnode => {
 	if (oldBeforeRender) oldBeforeRender(vnode);
 	currentComponent = vnode._component;
+	console.log('currentComponent', currentComponent);
 	currentIndex = 0;
 
 	const hooks = currentComponent.__hooks;
-	if (hooks) {
+	if (hooks) { // 执行清理操作
+		console.log(3333333, hooks);
 		hooks._pendingEffects.forEach(invokeCleanup);
 		hooks._pendingEffects.forEach(invokeEffect);
 		hooks._pendingEffects = [];
@@ -108,7 +114,6 @@ function getHookState(index, type) {
  */
 export function useState(initialState) {
 	currentHook = 1;
-	console.log('useState', initialState);
 	return useReducer(invokeOrReturn, initialState);
 }
 
@@ -124,10 +129,8 @@ export function useReducer(reducer, initialState, init) {
 	hookState._reducer = reducer;
 	if (!hookState._component) {
 		hookState._component = currentComponent;
-
 		hookState._value = [
 			!init ? invokeOrReturn(undefined, initialState) : init(initialState),
-
 			action => {
 				const nextValue = hookState._reducer(hookState._value[0], action);
 				if (hookState._value[0] !== nextValue) {

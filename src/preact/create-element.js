@@ -47,6 +47,7 @@ export function createElement(type, props, children) {
 
 /**
  * Create a VNode (used internally by Preact)
+ * @description 创建虚拟节点
  * @param {import('./internal').VNode["type"]} type The node name or Component
  * Constructor for this virtual node
  * @param {object | string | number | null} props The properties of this virtual node.

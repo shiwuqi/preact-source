@@ -45,7 +45,8 @@ Component.prototype.setState = function(update, callback) {
 	if (update == null) return;
 
 	if (this._vnode) {
-        if (callback) this._renderCallbacks.push(callback);
+		if (callback) this._renderCallbacks.push(callback);
+		console.log('this', this);
 		enqueueRender(this);
 	}
 };
@@ -115,6 +116,7 @@ export function getDomSibling(vnode, childIndex) {
  * @param {import('./internal').Component} component The component to rerender
  */
 function renderComponent(component) {
+	console.log('component', component);
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
@@ -213,6 +215,7 @@ function process() {
 		rerenderQueue = [];
 		// Don't update `renderCount` yet. Keep its value non-zero to prevent unnecessary
 		// process() calls from getting scheduled while `queue` is still being consumed.
+		console.log('queue', queue);
 		queue.some(c => {
 			if (c._dirty) renderComponent(c);
 		});

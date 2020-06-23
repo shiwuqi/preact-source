@@ -8,6 +8,7 @@ import options from '../options';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
+ * @description 对比虚拟节点，主要处理函数节点
  * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
@@ -22,7 +23,6 @@ import options from '../options';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  * @param {boolean} [isHydrating] Whether or not we are in hydration
  */
-// 对比虚拟节点，主要处理函数节点
 export function diff(
     parentDom,
     newVNode,
@@ -34,6 +34,17 @@ export function diff(
     oldDom,
     isHydrating
 ) {
+    console.log(
+        parentDom,
+        newVNode,
+        oldVNode,
+        globalContext,
+        isSvg,
+        excessDomChildren,
+        commitQueue,
+        oldDom,
+        isHydrating
+    )
     let tmp,
         newType = newVNode.type;
 
@@ -67,16 +78,15 @@ export function diff(
             } else {
                 // Instantiate the new component
                 if ('prototype' in newType && newType.prototype.render) {
-                    // 类组件的话，实例化
+                    // 类组件实例化
                     newVNode._component = c = new newType(newProps, componentContext); // eslint-disable-line new-cap
                 } else {
                     // 函数组件，实例化Component
                     newVNode._component = c = new Component(newProps, componentContext);
                     c.constructor = newType;
-                    c.render = doRender;
+                    c.render = doRender; // 设置render函数
                 }
                 if (provider) provider.sub(c);
-
                 c.props = newProps;
                 if (!c.state) c.state = {};
                 c.context = componentContext;
@@ -90,7 +100,7 @@ export function diff(
             if (c._nextState == null) {
                 c._nextState = c.state;
             }
-            // 若有getDerivedStateFromProps则执行getDerivedStateFromProps并扩展到_nextState
+            // 若有getDerivedStateFromProps(静态方法，判断newType中有没有getDerivedStateFromProps)则执行getDerivedStateFromProps并扩展到_nextState
             if (newType.getDerivedStateFromProps != null) {
                 if (c._nextState == c.state) {
                     c._nextState = assign({}, c._nextState);
@@ -171,7 +181,6 @@ export function diff(
             c.context = componentContext;
             c.props = newProps;
             c.state = c._nextState;
-
             if ((tmp = options._render)) {
                 tmp(newVNode);
             };
@@ -256,7 +265,7 @@ export function diff(
  * @param {import('../internal').VNode} root
  */
 export function commitRoot(commitQueue, root) {
-    if (options._commit) options._commit(root, commitQueue);
+    if (options._commit) options._commit(root, commitQueue); // 执行hooks回调
 
     commitQueue.some(c => {
         try {
@@ -442,7 +451,7 @@ export function applyRef(ref, value, vnode) {
  */
 export function unmount(vnode, parentVNode, skipRemove) {
     let r;
-    if (options.unmount) options.unmount(vnode);
+    if (options.unmount) options.unmount(vnode); // 执行hooks Effect操作
 
     if ((r = vnode.ref)) {
         if (!r.current || r.current === vnode._dom) applyRef(r, null, parentVNode);
